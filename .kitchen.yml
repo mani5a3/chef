@@ -1,0 +1,38 @@
+---
+driver:
+  name: ec2
+  aws_ssh_key_id: mani5a3 # give your existing pem file name
+  security_group_ids: ["sg-02bb192bdafa7f5a9"] # existing security_group_id
+  region: us-east-2
+  require_chef_omnibus: true
+  instance_type: t2.micro
+  associate_public_ip: true
+  profile: default
+
+
+provisioner:
+  name: chef_zero
+  # You may wish to disable always updating cookbooks in CI or other testing environments.
+  # For example:
+  #   always_update_cookbooks: <%= !ENV['CI'] %>
+  always_update_cookbooks: true
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: ubuntu-16.04
+    driver:
+      image_id: ami-0782e9ee97725263d
+    transport:
+      ssh_key: C:/chef-starter/chef-repo/cookbooks/tomcatbook/mani5a3.pem # give your pem file existing folder path
+      username: ubuntu
+
+suites:
+  - name: default
+    run_list:
+      - recipe[tomcatbook::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
